@@ -16,8 +16,6 @@ DEFAULT_M2 = 1
 # The gravitational acceleration (m.s-2).
 g = 9.81
 
-_pool_data = {}
-
 
 def deriv(y, t, L1, L2, m1, m2):
     """Return the first derivatives of y = theta1, z1, theta2, z2."""
