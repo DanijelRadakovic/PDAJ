@@ -16,6 +16,8 @@ DEFAULT_M2 = 1
 # The gravitational acceleration (m.s-2).
 g = 9.81
 
+_pool_data = {}
+
 
 def deriv(y, t, L1, L2, m1, m2):
     """Return the first derivatives of y = theta1, z1, theta2, z2."""
@@ -32,15 +34,7 @@ def deriv(y, t, L1, L2, m1, m2):
     return theta1dot, z1dot, theta2dot, z2dot
 
 
-def solve(args):
-    L1 = args['L1']
-    L2 = args['L2']
-    m1 = args['m1']
-    m2 = args['m2']
-    tmax = args['tmax']
-    dt = args['dt']
-    y0 = args['y0']
-
+def solve(L1, L2, m1, m2, tmax, dt, y0):
     t = np.arange(0, tmax + dt, dt)
 
     # Do the numerical integration of the equations of motion
@@ -53,14 +47,7 @@ def solve(args):
     x2 = x1 + L2 * np.sin(theta2)
     y2 = y1 - L2 * np.cos(theta2)
 
-    return {'theta1': theta1,
-            'theta2': theta2,
-            'x1': x1,
-            'y1': y1,
-            'x2': x2,
-            'y2': y2,
-            **args
-            }
+    return theta1, theta2, x1, y1, x2, y2
 
 
 def gen_simulation_model_params(theta_resolution):
@@ -70,25 +57,20 @@ def gen_simulation_model_params(theta_resolution):
             yield theta1_init, theta2_init
 
 
+def _worker(args):
+    theta1, theta2 = solve(*args[:-2])[:2]
+    return args[-2], args[-1], theta1[-1], theta2[-1]
+
+
 def simulate_pendulum(theta_resolution, dt=DEFAULT_DT, tmax=DEFAULT_TMAX, L1=DEFAULT_L1, L2=DEFAULT_L2, m1=DEFAULT_M1,
                       m2=DEFAULT_M2):
-
-    gen_params = ({'L1': L1,
-                   'L2': L2,
-                   'm1': m1,
-                   'm2': m2,
-                   'tmax': tmax,
-                   'dt': dt,
-                   'y0': np.array([theta1_init, 0, theta2_init, 0]),
-                   'theta1_init': theta1_init,
-                   'theta2_init': theta2_init
-                   }
+    gen_params = ((L1, L2, m1, m2, tmax, dt, np.array([theta1_init, 0, theta2_init, 0]), theta1_init, theta2_init)
                   for theta1_init, theta2_init in gen_simulation_model_params(theta_resolution))
 
     with Pool() as pool:
-        iter_result = pool.imap(solve, gen_params, chunksize=1000)
+        iter_result = pool.imap(_worker, gen_params, chunksize=1000)
         for result in iter_result:
-            yield result['theta1_init'], result['theta2_init'], result['theta1'][-1], result['theta2'][-1]
+            yield result
 
 
 def store_results(results, file):
