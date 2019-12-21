@@ -1,0 +1,6 @@
+.vagrant/
+*.pyc
+_developer_experiments/
+.vscode/
+venv
+.idea
