@@ -1,7 +1,5 @@
 FROM ubuntu:16.04
 
-MAINTAINER Petar Maric <petarmaric@uns.ac.rs>
-
 # Fix Docker-specific Ubuntu issues
 # (see https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/ for details)
 ENV DEBIAN_FRONTEND noninteractive
@@ -37,10 +35,6 @@ COPY docker/files/supervisor/celery.conf /etc/supervisor/conf.d/celery.conf
 COPY export_beam_integrals /code/export_beam_integrals/
 ENV PYTHONPATH /code
 
-# Configuration script (will be applied only if ENV 'DOCKER_CONFIGURE_SCRIPT' is set)
-ENV DOCKER_CONFIG_SCRIPT docker-configure.py
-COPY docker/${DOCKER_CONFIG_SCRIPT} /
-RUN chmod +x /${DOCKER_CONFIG_SCRIPT}
 
 # Starter script
 COPY docker/docker-entrypoint.sh /
