@@ -33,7 +33,7 @@ ENV BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN 1e-9
 COPY docker/files/supervisor/celery.conf /etc/supervisor/conf.d/celery.conf
 
 # Deploy the app
-COPY export_beam_integrals /code/export_beam_integrals/
+COPY pendulum /code/pendulum/
 ENV PYTHONPATH /code
 
 

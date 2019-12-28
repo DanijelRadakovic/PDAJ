@@ -21,7 +21,7 @@ if AM_I_SERVER:
         MONITORING_SERVER_NAME = os.getenv('MONITORING_SERVER_NAME', 'localhost')
         MONITORING_SERVER_PORT = int(os.getenv('MONITORING_SERVER_PORT', 2003))
         MONITORING_INTERVAL = int(os.getenv('MONITORING_INTERVAL', 30))
-        MONITORING_METRIC_PREFIX = os.getenv('MONITORING_METRIC_PREFIX', 'experiments.export_beam_integrals')
+        MONITORING_METRIC_PREFIX = os.getenv('MONITORING_METRIC_PREFIX', 'experiments.pendulum')
 
     HDF5_COMPLIB = os.getenv('HDF5_COMPLIB', 'zlib')
     HDF5_COMPLEVEL = int(os.getenv('HDF5_COMPLEVEL', 1))
@@ -69,7 +69,7 @@ else:
 
 class ServerTasksRouter(object):
     def route_for_task(self, task, args=None, kwargs=None):
-        if task.startswith('export_beam_integrals.tasks.server.'):
+        if task.startswith('pendulum.tasks.server.'):
             return {'queue': 'server'}
         
         return None
@@ -105,9 +105,9 @@ CELERY_ACKS_LATE = True
 ## Worker settings
 
 if AM_I_SERVER:
-    CELERY_IMPORTS = ['export_beam_integrals.tasks.server']
+    CELERY_IMPORTS = ['pendulum.tasks.server']
 else:
-    CELERY_IMPORTS = ['export_beam_integrals.tasks.worker']
+    CELERY_IMPORTS = ['pendulum.tasks.worker']
 
 # HACK: Prevents weird SymPy related memory leaks
 CELERYD_MAX_TASKS_PER_CHILD = 10
@@ -118,7 +118,7 @@ CELERYD_MAX_TASKS_PER_CHILD = 10
 if AM_I_SERVER and MONITORING_IS_ACTIVE:
     CELERYBEAT_SCHEDULE = {
         'monitor-queues': {
-            'task': 'export_beam_integrals.tasks.server.monitor_queues',
+            'task': 'pendulum.tasks.server.monitor_queues',
             'schedule': MONITORING_INTERVAL,
         },
     }

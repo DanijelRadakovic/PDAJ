@@ -2,8 +2,8 @@ from celery import Celery
 from celery.signals import worker_ready
 
 
-app = Celery('export_beam_integrals')
-app.config_from_object('export_beam_integrals.celeryconfig')
+app = Celery('pendulum')
+app.config_from_object('pendulum.celeryconfig')
 
 
 if app.conf.AM_I_SERVER:

@@ -159,7 +159,7 @@ def store_computed_integral_tables(integral_tables, beam_type_id):
     with tb.open_file(output_filename, 'w', filters=filters) as out:
         # Add the root group metadata, as per the section 3.2 of my PhD thesis
         out.root._v_attrs.created_at = get_experiment_status_time()
-        out.root._v_attrs.generator_name = 'export_beam_integrals'
+        out.root._v_attrs.generator_name = 'pendulum'
         out.root._v_attrs.generator_version = ebi.__version__
         out.root._v_attrs.beam_integrals_version = bi.__version__
         out.root._v_attrs.decimal_precision = decimal_precision

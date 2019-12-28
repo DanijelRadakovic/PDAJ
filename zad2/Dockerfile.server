@@ -30,7 +30,7 @@ ENV MONITORING_IS_ACTIVE 0
 ENV MONITORING_SERVER_NAME server
 ENV MONITORING_SERVER_PORT 2003
 ENV MONITORING_INTERVAL 30
-ENV MONITORING_METRIC_PREFIX experiments.export_beam_integrals
+ENV MONITORING_METRIC_PREFIX experiments.pendulum
 
 # App specific configuration, based on 'beam_integrals' defaults
 ENV BEAM_INTEGRALS_MAX_MODE 100
@@ -64,7 +64,7 @@ COPY docker/files/redis/redis.conf /etc/redis/redis.conf
 EXPOSE 5672 6379
 
 # Deploy the app
-COPY export_beam_integrals /code/export_beam_integrals/
+COPY pendulum /code/pendulum/
 ENV PYTHONPATH /code
 
 
