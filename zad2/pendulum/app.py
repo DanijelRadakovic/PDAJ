@@ -2,6 +2,15 @@ from celery import Celery
 from celery.signals import worker_ready
 
 
+DEFAULT_RESOLUTION = 6
+DEFAULT_TMAX = 30
+DEFAULT_DT = 0.01
+
+DEFAULT_L1 = 1
+DEFAULT_L2 = 1
+DEFAULT_M1 = 1
+DEFAULT_M2 = 1
+
 app = Celery('pendulum')
 app.config_from_object('pendulum.celeryconfig')
 

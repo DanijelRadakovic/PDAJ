@@ -8,18 +8,16 @@ ENV INITRD No
 # Update the Ubuntu package index and install the required Ubuntu packages
 RUN apt-get update && apt-get install -y \
   python-dev \
-  python-gmpy \
   python-pip \
-  python-tables \
+  python-scipy \
   rabbitmq-server \
   redis-server \
-  supervisor \
-  python-scipy
+  supervisor
 
 # Install the required Python packages
 # Celery has to be installed via pip, as Ubuntu distributes an older version which has a critical bug involving chords
 # (see http://celery.readthedocs.org/en/latest/changelog.html for details)
-RUN pip install "beam_integrals" "celery[librabbitmq,redis]==3.1.18"
+RUN pip install "celery[librabbitmq,redis]==3.1.18"
 
 # Parameterize this Dockerfile, by storing the configuration within environment variables 
 ENV MAX_CPU_CORES 1
@@ -32,14 +30,15 @@ ENV MONITORING_SERVER_PORT 2003
 ENV MONITORING_INTERVAL 30
 ENV MONITORING_METRIC_PREFIX experiments.pendulum
 
-# App specific configuration, based on 'beam_integrals' defaults
-ENV BEAM_INTEGRALS_MAX_MODE 100
-ENV BEAM_INTEGRALS_DECIMAL_PRECISION 155
-ENV BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN 1e-9
+# App specific configuration, based on 'pendulum' defaults
+ENV RESOLUTION 6
+ENV TMAX 30
+ENV DT 0.01
 
-# HDF5 storage configuration
-ENV HDF5_COMPLIB zlib
-ENV HDF5_COMPLEVEL 1
+ENV L1 1
+ENV L2 1
+ENV M1 1
+ENV M2 1
 
 # Create a directory for storing results
 ENV RESULTS_DIR /results

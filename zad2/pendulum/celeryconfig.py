@@ -1,19 +1,24 @@
 from multiprocessing import cpu_count
 import os
 
-from beam_integrals import DEFAULT_MAX_MODE, DEFAULT_DECIMAL_PRECISION
+from .app import DEFAULT_RESOLUTION, DEFAULT_TMAX, DEFAULT_DT, DEFAULT_L1, DEFAULT_L2, DEFAULT_M1, DEFAULT_M2
 from kombu import Queue
 
 
-## Environment based settings
+# Environment based settings
 
 MAX_CPU_CORES = os.getenv('MAX_CPU_CORES', cpu_count())
 SERVER_NAME = os.getenv('SERVER_NAME', 'localhost')
 AM_I_SERVER = (os.getenv('COMPUTER_TYPE') == 'server')
 
-BEAM_INTEGRALS_MAX_MODE = int(os.getenv('BEAM_INTEGRALS_MAX_MODE', DEFAULT_MAX_MODE))
-BEAM_INTEGRALS_DECIMAL_PRECISION = int(os.getenv('BEAM_INTEGRALS_DECIMAL_PRECISION', DEFAULT_DECIMAL_PRECISION))
-BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN = float(os.getenv('BEAM_INTEGRALS_NORMALIZE_INTEGRALS_SMALLER_THAN', 1e-9))
+RESOLUTION = int(os.getenv('RESOLUTION', DEFAULT_RESOLUTION))
+TMAX = int(os.getenv('TMAX', DEFAULT_TMAX))
+DT = float(os.getenv('DT', DEFAULT_DT))
+L1 = int(os.getenv('L1', DEFAULT_L1))
+L2 = int(os.getenv('L2', DEFAULT_L2))
+M1 = int(os.getenv('M1', DEFAULT_M1))
+M2 = int(os.getenv('M2', DEFAULT_M2))
+
 
 if AM_I_SERVER:
     MONITORING_IS_ACTIVE = bool(int(os.getenv('MONITORING_IS_ACTIVE', '0')))
@@ -30,7 +35,7 @@ if AM_I_SERVER:
     STATUS_DIR = os.path.join(RESULTS_DIR, 'status')
 
 
-## Concurrency settings
+# Concurrency settings
 
 CELERYD_CONCURRENCY = MAX_CPU_CORES
 
@@ -47,12 +52,12 @@ CELERYD_CONCURRENCY = MAX_CPU_CORES
 CELERYD_PREFETCH_MULTIPLIER = 1
 
 
-## Task result backend settings
+# Task result backend settings
 
 CELERY_RESULT_BACKEND = "redis://%s" % SERVER_NAME
 
 
-## Message Routing
+# Message Routing
 
 CELERY_DEFAULT_QUEUE = 'worker'
 CELERY_DEFAULT_EXCHANGE = 'tasks'
@@ -67,6 +72,7 @@ else:
         Queue('worker', routing_key='worker'),
     )
 
+
 class ServerTasksRouter(object):
     def route_for_task(self, task, args=None, kwargs=None):
         if task.startswith('pendulum.tasks.server.'):
@@ -74,18 +80,19 @@ class ServerTasksRouter(object):
         
         return None
 
+
 CELERY_ROUTES = (
     ServerTasksRouter(),
 )
 
 
-## Broker Settings
+# Broker Settings
 
 BROKER_URL = "amqp://%s" % SERVER_NAME
 CELERY_ACCEPT_CONTENT = ['pickle', 'json']
 
 
-## Task execution settings
+# Task execution settings
 
 CELERY_MESSAGE_COMPRESSION = 'bzip2'
 CELERY_TASK_RESULT_EXPIRES = None
@@ -102,7 +109,7 @@ CELERY_TRACK_STARTED = True
 CELERY_ACKS_LATE = True
 
 
-## Worker settings
+# Worker settings
 
 if AM_I_SERVER:
     CELERY_IMPORTS = ['pendulum.tasks.server']
@@ -113,7 +120,7 @@ else:
 CELERYD_MAX_TASKS_PER_CHILD = 10
 
 
-## Periodic Task Server (celery beat)
+# Periodic Task Server (celery beat)
 
 if AM_I_SERVER and MONITORING_IS_ACTIVE:
     CELERYBEAT_SCHEDULE = {
