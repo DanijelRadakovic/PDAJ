@@ -1,7 +1,8 @@
 from multiprocessing import cpu_count
 import os
 
-from .app import DEFAULT_RESOLUTION, DEFAULT_TMAX, DEFAULT_DT, DEFAULT_L1, DEFAULT_L2, DEFAULT_M1, DEFAULT_M2
+from .app import DEFAULT_RESOLUTION, DEFAULT_TMAX, DEFAULT_DT, DEFAULT_L1, DEFAULT_L2, DEFAULT_M1, DEFAULT_M2,\
+    DEFAULT_RESULTS_PATH
 from kombu import Queue
 
 
@@ -18,6 +19,7 @@ L1 = int(os.getenv('L1', DEFAULT_L1))
 L2 = int(os.getenv('L2', DEFAULT_L2))
 M1 = int(os.getenv('M1', DEFAULT_M1))
 M2 = int(os.getenv('M2', DEFAULT_M2))
+RESULTS_PATH = os.getenv('RESULTS_PATH', DEFAULT_RESULTS_PATH)
 
 
 if AM_I_SERVER:

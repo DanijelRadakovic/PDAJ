@@ -32,6 +32,7 @@ ENV L1 1
 ENV L2 1
 ENV M1 1
 ENV M2 1
+ENV RESULTS_PATH /results/distributed.csv
 
 # Supervisor configuration for Celery
 COPY docker/files/supervisor/celery.conf /etc/supervisor/conf.d/celery.conf

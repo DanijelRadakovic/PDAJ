@@ -10,6 +10,7 @@ DEFAULT_L1 = 1
 DEFAULT_L2 = 1
 DEFAULT_M1 = 1
 DEFAULT_M2 = 1
+DEFAULT_RESULTS_PATH = 'results.csv'
 
 app = Celery('pendulum')
 app.config_from_object('pendulum.celeryconfig')
@@ -18,11 +19,11 @@ app.config_from_object('pendulum.celeryconfig')
 if app.conf.AM_I_SERVER:
     @worker_ready.connect
     def bootstrap(**kwargs):
-        from .tasks.server import seed_computations
+        from .tasks.server import simulate_pendulum
 
         delay_time = 10 # seconds
         print "Getting ready to automatically seed computations in %d seconds..." % delay_time
-        seed_computations.apply_async(countdown=delay_time)
+        simulate_pendulum.apply_async(countdown=delay_time)
 
 
 if __name__ == '__main__':
