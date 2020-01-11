@@ -1,0 +1,28 @@
+worker:
+  build: .
+  dockerfile: Dockerfile.worker
+  hostname: worker
+  environment:
+    MAX_CPU_CORES: 2
+    MAX_RAM: 1g
+    BEAM_INTEGRALS_MAX_MODE: 2
+  cpuset: "0,1"
+  mem_limit: 1g
+  links:
+   - server
+
+server:
+  build: .
+  dockerfile: Dockerfile.server
+  hostname: server
+  ports:
+   - "5672:5672" # RabbitMQ
+   - "6379:6379" # Redis
+  environment:
+    MAX_CPU_CORES: 2
+    MAX_RAM: 1g
+    BEAM_INTEGRALS_MAX_MODE: 2
+  cpuset: "2,3"
+  mem_limit: 1g
+  volumes:
+   - /tmp/results:/results

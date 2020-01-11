@@ -1,0 +1,49 @@
+FROM ubuntu:16.04
+
+# Fix Docker-specific Ubuntu issues
+# (see https://journal.paul.querna.org/articles/2013/10/15/docker-ubuntu-on-rackspace/ for details)
+ENV DEBIAN_FRONTEND noninteractive
+ENV INITRD No
+
+# Update the Ubuntu package index and install the required Ubuntu packages
+RUN apt-get update && apt-get install -y \
+  python-dev \
+  python-pip \
+  python-scipy \
+  supervisor
+
+# Install the required Python packages
+# Celery has to be installed via pip, as Ubuntu distributes an older version which has a critical bug involving chords
+# (see http://celery.readthedocs.org/en/latest/changelog.html for details)
+RUN pip install "celery[librabbitmq,redis]==3.1.18"
+
+# Parameterize this Dockerfile, by storing the configuration within environment variables 
+ENV MAX_CPU_CORES 1
+ENV COMPUTER_TYPE worker
+ENV SERVER_NAME server
+ENV WORKER_LIST worker
+
+# App specific configuration, based on 'pendulum' defaults
+ENV RESOLUTION 6
+ENV TMAX 30
+ENV DT 0.01
+
+ENV L1 1
+ENV L2 1
+ENV M1 1
+ENV M2 1
+ENV RESULTS_PATH /results/distributed.csv
+
+# Supervisor configuration for Celery
+COPY docker/files/supervisor/celery.conf /etc/supervisor/conf.d/celery.conf
+
+# Deploy the app
+COPY pendulum /code/pendulum/
+ENV PYTHONPATH /code
+
+
+# Starter script
+COPY docker/docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["supervisord", "-n", "-c", "/etc/supervisor/supervisord.conf"]
